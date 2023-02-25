@@ -1,3 +1,6 @@
+//! A Tld Parser for parsing ANS domains in the Solana blockchain.
+//!
+
 use {
     solana_account_decoder::UiAccountEncoding,
     solana_client::{
