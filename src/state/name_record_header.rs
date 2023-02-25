@@ -35,6 +35,8 @@ impl<'a> NameRecordHeader {
     pub const HASH_PREFIX: &'a str = "ALT Name Service";
     pub const LEN: usize = 8 + std::mem::size_of::<NameRecordHeader>() + 80_usize;
 
+    /// deserializes the name record header if it exists.
+    /// will throw an error due to deserialization error.
     pub fn deserialize_name_record(src: &[u8]) -> Result<NameRecordHeader, Error> {
         let mut p = &src[8..];
         let name_record_header = NameRecordHeader::deserialize(&mut p)?;

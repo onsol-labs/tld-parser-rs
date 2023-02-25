@@ -6,7 +6,7 @@ use {
         rpc_filter::Memcmp,
         rpc_filter::RpcFilterType,
     },
-    solana_sdk::{hash::hashv, pubkey::Pubkey},
+    solana_sdk::pubkey::Pubkey,
     std::{
         error::Error,
         sync::Arc,
@@ -427,11 +427,7 @@ impl TldParser {
         name_account: &Pubkey,
         parent_account_owner: &Pubkey,
     ) -> Result<String, Box<dyn Error>> {
-        let reverse_lookup_hash = hashv(&[(NameRecordHeader::HASH_PREFIX.to_owned()
-            + &name_account.to_string())
-            .as_bytes()])
-        .as_ref()
-        .to_vec();
+        let reverse_lookup_hash = get_hashed_name(&name_account.to_string());
         let (reverse_lookup_key, _) = find_name_account_from_hashed_name(
             &reverse_lookup_hash,
             Some(parent_account_owner),
@@ -441,12 +437,7 @@ impl TldParser {
             .rpc_client
             .get_account_data(&reverse_lookup_key)
             .await?;
-        // let domain_len_start = 200;
-        // let domain_len_end = reverse_lookup_data.len();
 
-        // let domain_name = String::from(
-        //     std::str::from_utf8(&reverse_lookup_data[domain_len_start..domain_len_end]).unwrap(),
-        // );
         let domain_name =
             NameRecordHeader::deserialize_reverse_lookup_domain_name(&reverse_lookup_data).unwrap();
         Ok(domain_name)
@@ -494,11 +485,7 @@ impl TldParser {
             .await?;
         // name_class
         let (tld_house, _) = find_tld_house(&tld);
-        let reverse_lookup_hash = hashv(&[(NameRecordHeader::HASH_PREFIX.to_owned()
-            + &name_account.to_string())
-            .as_bytes()])
-        .as_ref()
-        .to_vec();
+        let reverse_lookup_hash = get_hashed_name(&name_account.to_string());
         let (reverse_lookup_key, _) =
             find_name_account_from_hashed_name(&reverse_lookup_hash, Some(&tld_house), None);
         let reverse_lookup_data = self
