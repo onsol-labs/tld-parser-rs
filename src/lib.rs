@@ -441,12 +441,14 @@ impl TldParser {
             .rpc_client
             .get_account_data(&reverse_lookup_key)
             .await?;
-        let domain_len_start = 200;
-        let domain_len_end = reverse_lookup_data.len();
+        // let domain_len_start = 200;
+        // let domain_len_end = reverse_lookup_data.len();
 
-        let domain_name = String::from(
-            std::str::from_utf8(&reverse_lookup_data[domain_len_start..domain_len_end]).unwrap(),
-        );
+        // let domain_name = String::from(
+        //     std::str::from_utf8(&reverse_lookup_data[domain_len_start..domain_len_end]).unwrap(),
+        // );
+        let domain_name =
+            NameRecordHeader::deserialize_reverse_lookup_domain_name(&reverse_lookup_data).unwrap();
         Ok(domain_name)
     }
 

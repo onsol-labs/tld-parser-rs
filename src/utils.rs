@@ -112,6 +112,6 @@ pub async fn get_record(
     ))?
     .pubkey;
     let name_record = client.get_account_data(&pubkey).await?;
-    let record_data = NameRecordHeader::deserialize_data_string(&name_record);
+    let record_data = NameRecordHeader::deserialize_data_string(&name_record).unwrap();
     Ok(Some(record_data))
 }
