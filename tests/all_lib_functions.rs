@@ -1,4 +1,4 @@
-use tldparser_rs::*;
+use tldparser::*;
 use {
     solana_client::nonblocking::rpc_client::RpcClient,
     solana_sdk::{pubkey, pubkey::Pubkey},
@@ -8,7 +8,8 @@ use {
 #[tokio::test]
 async fn all_lib_functions() -> Result<(), Box<dyn Error>> {
     /// intializations and constants
-    const API_ENDPOINT: &str = "";
+    const API_ENDPOINT: &str =
+        "https://rpc.helius.xyz/?api-key=d8bac93a-f701-4b34-99e4-5d42ee083f98";
 
     let rpc_client = RpcClient::new(API_ENDPOINT.to_string());
     let parser = TldParser {
@@ -24,7 +25,7 @@ async fn all_lib_functions() -> Result<(), Box<dyn Error>> {
     //     "result_all_user_domains: {:?} ",
     //     result_all_user_domains.len()
     // );
-    assert_eq!(result_all_user_domains.len(), 19);
+    assert_eq!(result_all_user_domains.len(), 18);
 
     let result_all_user_domains_from_tld =
         parser.get_all_user_domains_from_tld(&owner, &abc).await?;
@@ -32,10 +33,10 @@ async fn all_lib_functions() -> Result<(), Box<dyn Error>> {
     //     "result_all_user_domains_from_tld: {:?} ",
     //     result_all_user_domains_from_tld.len()
     // );
-    assert_eq!(result_all_user_domains_from_tld.len(), 16);
+    assert_eq!(result_all_user_domains_from_tld.len(), 3);
 
     let result_owner_from_domain_tld = parser
-        .get_owner_from_domain_tld(&"miester.abc".to_string())
+        .get_owner_from_domain_tld(&"cicu.abc".to_string())
         .await?;
     // println!(
     //     "result_owner_from_domain_tld: {:?} ",

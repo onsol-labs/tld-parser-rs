@@ -1,4 +1,6 @@
 use crate::{constants::*, name_record_handler::*, state::*, types::*};
+use serde;
+use serde_json;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{hash::hashv, pubkey::Pubkey};
 use std::error::Error;
@@ -114,4 +116,23 @@ pub async fn get_record(
     let name_record = client.get_account_data(&pubkey).await?;
     let record_data = NameRecordHeader::deserialize_data_string(&name_record).unwrap();
     Ok(Some(record_data))
+}
+
+#[derive(serde::Deserialize)]
+pub struct RpcTokenAccounts {
+    pub address: String,
+    pub amount: String,
+    pub decimals: u8,
+}
+
+pub async fn get_token_largest_accounts(
+    rpc: &RpcClient,
+    mint_address: &Pubkey,
+) -> Result<solana_client::rpc_response::Response<Vec<RpcTokenAccounts>>, Box<dyn std::error::Error>>
+{
+    let method = "getTokenLargestAccounts";
+    let request = solana_client::rpc_request::RpcRequest::Custom { method };
+    let params = serde_json::json!([mint_address.to_string()]);
+
+    rpc.send(request, params).await.map_err(|e| e.into())
 }

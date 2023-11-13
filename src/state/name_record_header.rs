@@ -26,6 +26,8 @@ pub struct NameRecordHeader {
     /// new owner comes with new data replacing the old one.
     /// defaults to 0
     pub expires_at: u64,
+    pub created_at: u64,
+    pub non_transferable: bool,
     /// is the name account data valid (not expired)
     pub is_valid: bool,
     // data sits here owner/parent name owner can add as many data as they please.
@@ -33,7 +35,7 @@ pub struct NameRecordHeader {
 
 impl<'a> NameRecordHeader {
     pub const HASH_PREFIX: &'a str = "ALT Name Service";
-    pub const LEN: usize = 8 + std::mem::size_of::<NameRecordHeader>() + 80_usize;
+    pub const LEN: usize = 200;
 
     /// deserializes the name record header if it exists.
     /// will throw an error due to deserialization error.

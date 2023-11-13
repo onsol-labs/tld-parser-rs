@@ -1,5 +1,7 @@
-//! A Tld Parser for parsing ANS domains in the Solana blockchain.
+//! A Tld Parser for parsing AllDomains ANS domains in the Solana blockchain.
 //!
+
+use std::str::FromStr;
 
 use {
     solana_account_decoder::UiAccountEncoding,
@@ -10,6 +12,7 @@ use {
         rpc_filter::RpcFilterType,
     },
     solana_sdk::pubkey::Pubkey,
+    spl_token_2022::{extension::StateWithExtensions, state::Account},
     std::{
         error::Error,
         sync::Arc,
@@ -46,7 +49,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -83,7 +86,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -134,7 +137,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -194,7 +197,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -236,7 +239,31 @@ impl TldParser {
                 name_account.is_valid = true;
             }
         }
-        Ok(name_account.owner)
+        let mut owner = name_account.owner;
+        let (tld_house_key, _) = find_tld_house(&tld);
+        let (name_house_key, _) = find_name_house(&tld_house_key);
+        // check whether domain is wrapped.
+        let nft_record_key = find_nft_record(&name_account_key, &name_house_key).0;
+        if owner == nft_record_key {
+            let nft_record_data_vec = self.rpc_client.get_account_data(&nft_record_key).await?;
+            let nft_record = NftRecord::from_account_info(&nft_record_data_vec)?;
+            let response =
+                get_token_largest_accounts(&self.rpc_client, &nft_record.nft_mint_account).await?;
+            let associated_token_account =
+                Pubkey::from_str(&response.value.first().unwrap().address).unwrap();
+            let associated_token_account_data = self
+                .rpc_client
+                .get_account_data(&associated_token_account)
+                .await?;
+
+            let ata_data = &associated_token_account_data;
+            if let Ok(associated_token_account_data_account) =
+                StateWithExtensions::<Account>::unpack(&ata_data)
+            {
+                owner = associated_token_account_data_account.base.owner;
+            }
+        }
+        Ok(owner)
     }
 
     /// Returns the name_record_header from domain name e.g. "miester.abc"
@@ -253,7 +280,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -309,7 +336,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -358,7 +385,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::TldParser;
+    /// use tldparser::TldParser;
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -409,7 +436,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::{pda::*, TldParser};
+    /// use tldparser::{pda::*, TldParser};
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
@@ -463,7 +490,7 @@ impl TldParser {
     ///     nonblocking::rpc_client::RpcClient,
     ///     client_error::ClientError,
     /// };
-    /// use tldparser_rs::{pda::*, TldParser};
+    /// use tldparser::{pda::*, TldParser};
     ///
     /// const API_ENDPOINT: &str = "";
     /// #[tokio::main]
