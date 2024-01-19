@@ -1,6 +1,6 @@
 [package]
 name = "tldparser"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "AllDomains (ANS) Protocol rust client tld parser"
 authors = ["Miester <crypt0miester@gmail.com>"]
@@ -18,4 +18,4 @@ solana-account-decoder = "^1.14"
 solana-client = "^1.14"
 solana-sdk = "^1.14"
 tokio = "1.24.1"
-spl-token-2022 ="^0.9.0"
+spl-token-2022 ="^1.0.0"

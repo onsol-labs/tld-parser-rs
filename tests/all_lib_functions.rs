@@ -8,8 +8,7 @@ use {
 #[tokio::test]
 async fn all_lib_functions() -> Result<(), Box<dyn Error>> {
     /// intializations and constants
-    const API_ENDPOINT: &str =
-        "https://rpc.helius.xyz/?api-key=d8bac93a-f701-4b34-99e4-5d42ee083f98";
+    const API_ENDPOINT: &str = "";
 
     let rpc_client = RpcClient::new(API_ENDPOINT.to_string());
     let parser = TldParser {
