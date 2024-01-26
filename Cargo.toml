@@ -1,6 +1,6 @@
 [package]
 name = "tldparser"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "AllDomains (ANS) Protocol rust client tld parser"
 authors = ["Miester <crypt0miester@gmail.com>"]
