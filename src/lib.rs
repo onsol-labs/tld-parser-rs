@@ -234,7 +234,7 @@ impl TldParser {
             // grace period  = 45 days * 24 hours * 60 minutes * 60 seconds = 3_888_000 seconds
             let grace_period = 45 * 24 * 60 * 60;
             // added grace period = 45 days in unix_timestamp (seconds)
-            if time_now > name_account.expires_at + grace_period {
+            if time_now + grace_period > name_account.expires_at {
                 name_account.is_valid = false;
                 name_account.owner = Pubkey::default();
             } else {
@@ -317,7 +317,9 @@ impl TldParser {
                 .unwrap()
                 .as_secs();
 
-            if name_account.expires_at > time_now {
+            // grace period  = 45 days * 24 hours * 60 minutes * 60 seconds = 3_888_000 seconds
+            let grace_period = 45 * 24 * 60 * 60;
+            if time_now + grace_period > name_account.expires_at {
                 name_account.is_valid = true
             }
         }
@@ -366,8 +368,11 @@ impl TldParser {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_secs();
+            
+            // grace period  = 45 days * 24 hours * 60 minutes * 60 seconds = 3_888_000 seconds
+            let grace_period = 45 * 24 * 60 * 60;
 
-            if name_account.expires_at > time_now {
+            if time_now + grace_period > name_account.expires_at {
                 name_account.is_valid = true
             }
         }
